@@ -1,7 +1,7 @@
-from Tkinter import *
-from PIL import ImageTk, Image
+import window
 
-VERSION = "0.2"
+BLACK = 'black'
+WHITE = 'white'
 
 DARK_COLOR = "#1F53AD"
 LIGHT_COLOR = "#e6e6e6"
@@ -9,30 +9,9 @@ SQUARE_SIZE = 100
 BOARD_WIDTH = 8
 BOARD_HEIGHT = 8
 
-BLACK = 'black'
-WHITE = 'white'
-
 class Board:
   def __init__(self):
     self.spaces = [[0 for x in range(BOARD_HEIGHT)] for x in range(BOARD_WIDTH)]
-    self.space_of_piece_selected = None
-    CANVAS.bind("<Button-1>", self.click_callback)
-
-    self.draw()
-    self.place_pieces()
-
-  # TODO: maybe we should move the clicking elsewhere?
-  def click_callback(self, event):
-    print "clicked at", event.x, event.y
-    (x, y) = (event.x / SQUARE_SIZE, event.y / SQUARE_SIZE)
-    space = self.spaces[x][y]
-    if self.space_of_piece_selected:
-      piece = self.space_of_piece_selected.piece
-      self.space_of_piece_selected.remove_piece()
-      space.place_piece(piece)
-      self.space_of_piece_selected = None
-    else:
-      self.space_of_piece_selected = space
 
 
   def get_pixels(self, i):
@@ -51,6 +30,8 @@ class Board:
         # TODO: better piece placement.
       color = self.flip_color(color)
 
+    self.place_pieces()
+
   def draw_space(self, x, y, color):
     space = Space(x, y, color)
     space.draw()
@@ -61,6 +42,10 @@ class Board:
     for col in [1, BOARD_HEIGHT-2]:
       for row in range(0, BOARD_WIDTH):
         self.spaces[row][col].place_piece(Piece(BLACK if col is 1 else WHITE))
+
+  def get_space_at_pixels(self, x, y):
+    (x, y) = (x / SQUARE_SIZE, y / SQUARE_SIZE)
+    return self.spaces[x][y]
 
 class Space:
   def __init__(self, x, y, color):
@@ -78,11 +63,11 @@ class Space:
 
   def draw(self):
     (x0, y0) = self.get_pixels()
-    CANVAS.create_rectangle(x0, y0, (x0 + SQUARE_SIZE), (y0 + SQUARE_SIZE), fill = self.color, outline = self.color)
-    print 'space', x0, y0, self.color
+    window.draw_rectangle(x0, y0, (x0 + SQUARE_SIZE), (y0 + SQUARE_SIZE), self.color)
 
   def place_piece(self, piece):
-    # TODO: check if there's a piece and throw an exception
+    if self.has_piece():
+      raise Exception("A space can only have one piece.")
     self.piece = piece
     (x, y) = self.get_piece_center_pixels()
     piece.move(x, y)
@@ -90,29 +75,28 @@ class Space:
   def has_piece(self):
     return self.piece != None
 
+  def get_piece(self):
+    return self.piece
+
   def remove_piece(self):
     self.piece = None
 
 images = []
 class Piece:
-    def __init__(self, color):
-      global images
-      f = '/Volumes/projects/chuns/resources/pieces/pawn_%s.png' % color
-      image = ImageTk.PhotoImage(file=f)
-      images.append(image)
-      self.image = CANVAS.create_image(SQUARE_SIZE, SQUARE_SIZE, image=image)
+  def __init__(self, color):
+    f = '/Volumes/projects/chuns/resources/pieces/pawn_%s.png' % color
+    self.image = window.add_image(SQUARE_SIZE, SQUARE_SIZE, f)
+    self.captured = False
 
-    def move(self, x, y):
-      print 'move', x, y
-      CANVAS.coords(self.image, (x, y))
+  def move(self, x, y):
+    print 'move', x, y
+    window.move_image(self.image, x, y)
+
+  def capture(self):
+    window.remove(image)
+    self.captured = True
 
 # TODO: move to Game class.
-WINDOW = Tk()
-WINDOW.title("Chuns %s" % VERSION)
-CANVAS = Canvas(WINDOW, width=SQUARE_SIZE*BOARD_WIDTH, height=SQUARE_SIZE*BOARD_HEIGHT)
-board = Board()
-CANVAS.pack()
-WINDOW.mainloop()
 
 """
 def callback(event):
@@ -125,4 +109,4 @@ def motion(event):
     x, y = event.x, event.y
     print('{}, {}'.format(x, y))
 
-window.bind('<Motion>', motion)
+#window.bind('<Motion>', motion)
