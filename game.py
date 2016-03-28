@@ -43,7 +43,6 @@ class UserInputManager:
 
   # TODO: maybe we should move the clicking elsewhere?
   def click_callback(self, event):
-    print "clicked at", event.x, event.y
     (x, y) = (event.x, event.y)
     space = self.board.get_space_at_pixels(x, y)
 

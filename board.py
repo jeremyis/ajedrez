@@ -51,7 +51,6 @@ class Board:
     letter = notation[:1]
     x = (ord(letter) - 96) - 1
     y = CONFIG.BOARD_HEIGHT - int(notation[1:len(notation)])
-    print notation, '->', x, y
     return self.spaces[x][y]
 
 

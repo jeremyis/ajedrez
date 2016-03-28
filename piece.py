@@ -19,7 +19,6 @@ class Piece(object):
     self.name = ''
 
   def move(self, x, y):
-    print 'move', x, y
     window.move_image(self.image, x, y)
 
   def draw(self):
@@ -31,7 +30,6 @@ class Piece(object):
     self.captured = True
 
   def get_file(self):
-    print '%s%s_%s.png' % (piece_directory, self.name, self.color)
     return '%s%s_%s.png' % (piece_directory, self.name, self.color)
 
 class Pawn(Piece):
