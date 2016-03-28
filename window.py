@@ -26,7 +26,7 @@ def move_image(image, x, y):
   CANVAS.coords(image, (x, y))
 
 def remove(image):
-  CANVAS.remove(image)
+  CANVAS.delete(image)
 
 def bind_left_click(callback):
   CANVAS.bind("<Button-1>", callback)

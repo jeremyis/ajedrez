@@ -4,6 +4,12 @@ def enum(**enums):
 PIECES = enum(PAWN=0, KING=1, QUEEN=2, BISHOP=3, KNIGHT=4, ROOK=5)
 TEAMS = enum(WHITE='white', BLACK='black')
 
+# Directions the pawns move in. Positive is up.
+TEAM_DIRECTION = {
+  'white': 1,
+  'black': -1
+}
+
 
 class GameConfig:
   first_mover = None

@@ -77,6 +77,14 @@ class Space:
       raise Exception("A space can only have one piece.")
     self.piece = piece
     (x, y) = self.get_piece_center_pixels()
+    piece.place(x, y)
+
+  def move_piece_here(self, piece, from_space):
+    if self.has_piece():
+      raise Exception("A space can only have one piece.")
+    self.piece = piece
+    from_space.remove_piece()
+    (x, y) = self.get_piece_center_pixels()
     piece.move(x, y)
 
   def has_piece(self):
@@ -87,6 +95,14 @@ class Space:
 
   def remove_piece(self):
     self.piece = None
+
+  # Positive is to the right, negative to the left. Inclusive of final space.
+  def get_horizontal_distance_to(self, dest_space):
+    return dest_space.x - self.x
+
+  # Positive is up, negative down (note: opposite of y coordinates). Inclusive of final space.
+  def get_vertical_distance_to(self, dest_space):
+    return -1*(dest_space.y - self.y)
 
 # TODO: move to Game class.
 
