@@ -64,6 +64,10 @@ class UserInputManager:
 
     if self.space_of_piece_selected == None:
       self.space_of_piece_selected = space
+
+    # Clicking on the same space clears the state.
+    elif self.space_of_piece_selected == space:
+      self.space_of_piece_selected = None
     else:
       from_space = self.space_of_piece_selected
       self.move(from_space, space)
