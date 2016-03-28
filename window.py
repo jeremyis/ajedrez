@@ -3,8 +3,6 @@ from PIL import ImageTk
 
 from config import CONFIG
 
-VERSION = "0.2"
-
 # There is a bug with Tkinter where images
 images = {}
 
@@ -33,6 +31,7 @@ def remove(image):
 def bind_left_click(callback):
   CANVAS.bind("<Button-1>", callback)
 
+VERSION = "0.1"
 WINDOW = Tk()
-WINDOW.title("Chuns %s" % VERSION)
+WINDOW.title("Alejdrez %s" % VERSION)
 CANVAS = Canvas(WINDOW, width=CONFIG.SQUARE_SIZE*CONFIG.BOARD_WIDTH, height=CONFIG.SQUARE_SIZE*CONFIG.BOARD_HEIGHT)
