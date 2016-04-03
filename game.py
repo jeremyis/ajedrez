@@ -22,6 +22,10 @@ class Game:
     if piece.color != self.whosePly:
       return
 
+    # You cannot move to a space containing your piece
+    if dest_space.has_piece() and dest_space.piece.color == self.whosePly:
+      return
+
     # On an empty board, does the piece allow this movement?
     if not piece.can_move(from_space, dest_space):
       return
