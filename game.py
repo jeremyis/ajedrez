@@ -30,6 +30,10 @@ class Game:
     if not piece.can_move(from_space, dest_space):
       return
 
+    # Make sure we are not 'jumping' over pieces, unless the piece jumps.
+    if not (piece.can_jump or self.no_piece_obstructs(from_space, dest_space)):
+      return
+
     # Can we capture?
     if dest_space.has_piece():
       dest_space.piece.capture()
@@ -38,6 +42,31 @@ class Game:
 
     # TODO: is there a way we can make our run loop better?
     self.whosePly = TEAMS.BLACK if self.whosePly == TEAMS.WHITE else TEAMS.WHITE
+
+  def no_piece_obstructs(self, from_space, dest_space):
+    (x, y) = (from_space.x, from_space.y)
+    (x1, y1) = (dest_space.x, dest_space.y)
+
+    def inc(source, dest):
+      diff = dest - source
+      if diff == 0:
+        return 0
+      return 1 if diff > 0 else -1
+
+    def next_space(x, y):
+      x += inc(x, x1)
+      y += inc(y, y1)
+      return (x, y)
+
+    # Do not check the current space, nor the final space.
+    (x, y) = next_space(x, y)
+    while x != x1 and y != y1:
+      space = self.board.spaces[x][y]
+      if space.has_piece():
+        return False
+      (x, y) = next_space(x, y)
+
+    return True
 
 
   def run(self):

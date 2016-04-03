@@ -18,6 +18,7 @@ class Piece(object):
     self.captured = False
     self.name = ''
     self.moves_made = 0
+    self.can_jump = False
 
   def place(self, x, y):
     window.move_image(self.image, x, y)
@@ -100,10 +101,17 @@ class Bishop(Piece):
     super(Bishop, self).__init__(color)
     self.name = 'bishop'
 
+  def can_move(self, from_space, dest_space):
+    hor = from_space.get_horizontal_distance_to(dest_space)
+    vert = from_space.get_vertical_distance_to(dest_space)
+
+    return abs(hor) == abs(vert)
+
 class Knight(Piece):
   def __init__(self, color):
     super(Knight, self).__init__(color)
     self.name = 'knight'
+    self.can_jump = True
 
   def can_move(self, from_space, dest_space):
     hor = from_space.get_horizontal_distance_to(dest_space)
