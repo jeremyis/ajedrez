@@ -61,7 +61,7 @@ class Game:
 
     # Do not check the current space, nor the final space.
     (x, y) = next_space(x, y)
-    while x != x1 and y != y1:
+    while not (x == x1 and y == y1):
       space = self.board.spaces[x][y]
       if space.has_piece():
         return False
