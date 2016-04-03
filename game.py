@@ -5,7 +5,7 @@ from config import TEAMS
 class Game:
   def __init__(self):
     self.board = Board()
-    self.input_manager = UserInputManager(self.board, self.move)
+    self.input_manager = UserInputManager(self.board, self.move, self.whose_ply)
     self.captured = []
     self.whosePly = TEAMS.WHITE
 
@@ -43,6 +43,9 @@ class Game:
     # TODO: is there a way we can make our run loop better?
     self.whosePly = TEAMS.BLACK if self.whosePly == TEAMS.WHITE else TEAMS.WHITE
     print "Waiting on %s to move." % ('WHITE' if self.whosePly == TEAMS.WHITE else 'BLACK')
+
+  def whose_ply(self):
+    return self.whosePly
 
   def no_piece_obstructs(self, from_space, dest_space):
     (x, y) = (from_space.x, from_space.y)
@@ -85,10 +88,11 @@ class Game:
       # next person turn.
 
 class UserInputManager:
-  def __init__(self, board, move_cb):
+  def __init__(self, board, move_cb, whose_ply):
     self.move = move_cb
     self.board = board
     self.space_of_piece_selected = None
+    self.whose_ply = whose_ply
     window.bind_left_click(self.click_callback)
 
   # TODO: maybe we should move the clicking elsewhere?
@@ -96,14 +100,18 @@ class UserInputManager:
     (x, y) = (event.x, event.y)
     space = self.board.get_space_at_pixels(x, y)
 
-    if self.space_of_piece_selected == None:
-      self.space_of_piece_selected = space
+    noSpaceAlreadySelected = self.space_of_piece_selected == None
+    isPlayersPiece = space.piece and space.piece.color is self.whose_ply()
 
+    if noSpaceAlreadySelected:
+      # Make sure they are selecting a space with the players'  piece.
+      if space.has_piece() and isPlayersPiece:
+        self.space_of_piece_selected = space
     # Clicking on the same space clears the state.
     elif self.space_of_piece_selected == space:
       self.space_of_piece_selected = None
     else:
       from_space = self.space_of_piece_selected
-      self.move(from_space, space)
+      move = self.move(from_space, space)
       self.space_of_piece_selected = None
 
