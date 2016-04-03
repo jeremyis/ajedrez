@@ -105,6 +105,18 @@ class Knight(Piece):
     super(Knight, self).__init__(color)
     self.name = 'knight'
 
+  def can_move(self, from_space, dest_space):
+    hor = from_space.get_horizontal_distance_to(dest_space)
+    vert = from_space.get_vertical_distance_to(dest_space)
+
+    if abs(hor) == 1 and abs(vert) == 2:
+      return True
+
+    if abs(hor) == 2 and abs(vert) == 1:
+      return True
+
+    return False
+
 class Rook(Piece):
   def __init__(self, color):
     super(Rook, self).__init__(color)
