@@ -23,7 +23,6 @@ class Board:
         space = self.draw_space(row, col, color)
         color = self.flip_color(color)
 
-        # TODO: better piece placement.
       color = self.flip_color(color)
 
     self.place_pieces()
