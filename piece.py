@@ -129,3 +129,10 @@ class Rook(Piece):
   def __init__(self, color):
     super(Rook, self).__init__(color)
     self.name = 'rook'
+
+  def can_move(self, from_space, dest_space):
+    hor = from_space.get_horizontal_distance_to(dest_space)
+    vert = from_space.get_vertical_distance_to(dest_space)
+
+    return hor == 0 or vert == 0
+
