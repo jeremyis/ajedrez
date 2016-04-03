@@ -102,6 +102,18 @@ class King(Piece):
   def __init__(self, color):
     super(King, self).__init__(color)
     self.name = 'king'
+  def can_move(self, from_space, dest_space):
+    # TODO: this is duplicated in all the pieces movements, we should do it another way.
+    hor = from_space.get_horizontal_distance_to(dest_space)
+    vert = from_space.get_vertical_distance_to(dest_space)
+    hor = abs(hor)
+    vert = abs(vert)
+
+    # Can only move one square.
+    if not (hor + vert > 0 and hor in (0, 1) and vert in (0, 1)):
+      return
+
+    return self._move_is_straight(from_space, dest_space) or self._move_is_diagonal(from_space, dest_space)
 
 class Queen(Piece):
   def __init__(self, color):
