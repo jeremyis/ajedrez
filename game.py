@@ -42,6 +42,7 @@ class Game:
 
     # TODO: is there a way we can make our run loop better?
     self.whosePly = TEAMS.BLACK if self.whosePly == TEAMS.WHITE else TEAMS.WHITE
+    print "Waiting on %s to move." % ('WHITE' if self.whosePly == TEAMS.WHITE else 'BLACK')
 
   def no_piece_obstructs(self, from_space, dest_space):
     (x, y) = (from_space.x, from_space.y)
