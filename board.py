@@ -63,7 +63,7 @@ class Space:
   def get_pixels(self):
     return (self.x*CONFIG.SQUARE_SIZE, self.y*CONFIG.SQUARE_SIZE)
 
-  def get_piece_center_pixels(self):
+  def get_center_pixels(self):
     (x, y) = self.get_pixels()
     return (x + CONFIG.SQUARE_SIZE/2, y + CONFIG.SQUARE_SIZE/2)
 
@@ -75,7 +75,7 @@ class Space:
     if self.has_piece():
       raise Exception("A space can only have one piece.")
     self.piece = piece
-    (x, y) = self.get_piece_center_pixels()
+    (x, y) = self.get_center_pixels()
     piece.place(x, y)
 
   def move_piece_here(self, piece, from_space):
@@ -83,7 +83,7 @@ class Space:
       raise Exception("A space can only have one piece.")
     self.piece = piece
     from_space.remove_piece()
-    (x, y) = self.get_piece_center_pixels()
+    (x, y) = self.get_center_pixels()
     piece.move(x, y)
 
   def has_piece(self):

@@ -28,8 +28,16 @@ def move_image(image, x, y):
 def remove(image):
   CANVAS.delete(image)
 
-def bind_left_click(callback):
+def bind_left_click_down(callback):
   CANVAS.bind("<Button-1>", callback)
+def bind_left_click_up(callback):
+  CANVAS.bind("<ButtonRelease-1>", callback)
+def bind_mouse_motion(callback):
+  WINDOW.bind('<Motion>', callback)
+def unbind_left_click_up():
+  CANVAS.unbind("<ButtonRelease-1>")
+def unbind_mouse_motion():
+  WINDOW.unbind('<Motion>')
 
 VERSION = "0.1"
 WINDOW = Tk()
