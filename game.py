@@ -175,12 +175,11 @@ class UserInputManager:
 
     try:
       dest_space = self._get_space_from_event(event)
-      successful_move = self.move(from_space, dest_space)
     except:
       pass
+    successful_move = self.move(from_space, dest_space)
 
     if not successful_move:
-      print "Snap the piece back!"
       (x, y) = from_space.get_center_pixels()
       from_space.piece.place(x, y)
 
