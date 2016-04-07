@@ -1,6 +1,7 @@
 import window
 from board import Board
 from config import TEAMS
+from piece import King, Rook
 
 class Game:
   def __init__(self):
@@ -9,8 +10,7 @@ class Game:
     self.captured = []
     self.whosePly = TEAMS.WHITE
 
-  # Returns False if the move cannot be made, True if it can be and was made.
-  def move(self, from_space, dest_space):
+  def move_inner(self, from_space, dest_space):
     # TODO: make sure we are not moving into check.
 
     if not from_space.has_piece():
@@ -25,6 +25,10 @@ class Game:
     if dest_space.has_piece() and dest_space.piece.color == self.whosePly:
       return False
 
+    # Perform a castle if that is the move.
+    if self.castle(from_space, dest_space):
+      return True
+
     # On an empty board, does the piece allow this movement?
     if not piece.can_move(from_space, dest_space):
       return False
@@ -38,10 +42,56 @@ class Game:
       dest_space.piece.capture()
       dest_space.remove_piece()
     dest_space.move_piece_here(piece, from_space)
+    return True
 
-    # TODO: is there a way we can make our run loop better?
-    self.whosePly = TEAMS.BLACK if self.whosePly == TEAMS.WHITE else TEAMS.WHITE
-    print "Waiting on %s to move." % ('WHITE' if self.whosePly == TEAMS.WHITE else 'BLACK')
+  # Returns False if the move cannot be made, True if it can be and was made.
+  def move(self, from_space, dest_space):
+    if self.move_inner(from_space, dest_space):
+      self.whosePly = TEAMS.BLACK if self.whosePly == TEAMS.WHITE else TEAMS.WHITE
+      print "Waiting on %s to move." % ('WHITE' if self.whosePly == TEAMS.WHITE else 'BLACK')
+      return True
+    return False
+
+  # Returns false if the move is not a permittable castle move, true if it is and the move was made.
+  def castle(self, from_space, dest_space):
+
+    # Is the moved piece a king?
+    king = from_space.piece
+    if not isinstance(king, King):
+      return False
+
+    hor = from_space.get_horizontal_distance_to(dest_space)
+    vert = from_space.get_vertical_distance_to(dest_space)
+
+    # Has the king moved horizontally two spaces?
+    if not (abs(hor) == 2 and vert == 0):
+      return False
+
+    to_the_right = hor == 2
+    castle_y = dest_space.y
+
+    # Is there a rook two spaces to the left of your movement (or one to the right?).
+    expected_rook_x = dest_space.x + 1 if to_the_right else dest_space.x - 2
+    rook_space = self.board.spaces[expected_rook_x][castle_y]
+    rook = rook_space.piece
+    if not isinstance(rook, Rook):
+      return False
+
+    # Have the rook and king never moved?
+    if king.moves_made != 0 or rook.moves_made != 0:
+      return False
+
+    # Are there no pieces between the rook and king?
+    if not self.no_piece_obstructs(from_space, rook_space):
+      return False
+
+    # TODO: Does an enemy control any spaces that the king moves?
+    # TODO: is the king in check?
+    rooks_dest_x = dest_space.x - 1 if to_the_right else dest_space.x + 1
+    rook_dest_space = self.board.spaces[rooks_dest_x][castle_y]
+
+    dest_space.move_piece_here(king, from_space)
+    rook_dest_space.move_piece_here(rook, rook_space)
     return True
 
   def whose_ply(self):
