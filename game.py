@@ -11,11 +11,17 @@ class Game:
     self.whosePly = TEAMS.WHITE
 
   def move_inner(self, from_space, dest_space):
-    # TODO: make sure we are not moving into check.
-
     if not from_space.has_piece():
       return False
     piece = from_space.get_piece()
+
+    # TODO: this is the wrong place to check for check!
+    # ALSO, we need to generate a new set of spaces and see if the potential
+    # move removes the check.
+    in_check = self.check(self.board.spaces, self.whosePly)
+    if in_check:
+      print "%s is in check!" % self.whosePly
+      return False
 
     # Only move your pieces.
     if piece.color != self.whosePly:
@@ -26,7 +32,7 @@ class Game:
       return False
 
     # Perform a castle if that is the move.
-    if self.castle(from_space, dest_space):
+    if self.castle(from_space, dest_space, in_check):
       return True
 
     # On an empty board, does the piece allow this movement?
@@ -47,13 +53,56 @@ class Game:
   # Returns False if the move cannot be made, True if it can be and was made.
   def move(self, from_space, dest_space):
     if self.move_inner(from_space, dest_space):
-      self.whosePly = TEAMS.BLACK if self.whosePly == TEAMS.WHITE else TEAMS.WHITE
+      self.whosePly = self.get_opponent(self.whosePly)
       print "Waiting on %s to move." % ('WHITE' if self.whosePly == TEAMS.WHITE else 'BLACK')
       return True
     return False
 
+  # TODO: probably belongs somewhere else
+  def find_king_space(self, spaces, team):
+    for row in spaces:
+      for col in range(len(row)):
+        space = row[col]
+        if not space.has_piece():
+          continue
+        if space.piece.color is team and isinstance(space.piece, King):
+          return space
+    return None
+
+  # TODO: probably belongs somewhere else
+  def find_pieces_spaces(self, spaces, team):
+    result = []
+    for row in spaces:
+      for col in range(len(row)):
+        space = row[col]
+        if not space.has_piece():
+          continue
+        if space.piece.color is team:
+          result.append(space)
+    return result
+
+  # TODO: probably belongs somewhere else
+  def get_opponent(self, team):
+    return TEAMS.BLACK if team == TEAMS.WHITE else TEAMS.WHITE
+
+  # Is the given team in check for the provided spaces.
+  def check(self, spaces, team):
+    enemy_piece_spaces = self.find_pieces_spaces(spaces, self.get_opponent(team))
+    team_king_space = self.find_king_space(spaces, team)
+    for space in enemy_piece_spaces:
+      # If a piece can move there, it controls it.
+      if space.piece.can_move(space, team_king_space):
+        return True
+    return False
+
+  def check_mate(self, spaces, team):
+    pass
+
   # Returns false if the move is not a permittable castle move, true if it is and the move was made.
-  def castle(self, from_space, dest_space):
+  def castle(self, from_space, dest_space, in_check):
+    # The player cannot castle out of check.
+    if in_check:
+      return False
 
     # Is the moved piece a king?
     king = from_space.piece
@@ -86,7 +135,9 @@ class Game:
       return False
 
     # TODO: Does an enemy control any spaces that the king moves?
-    # TODO: is the king in check?
+    # 1) generate the spaces between the king and its destination.
+    # 2) Check if any of our enemy's pieces can move to those squares
+
     rooks_dest_x = dest_space.x - 1 if to_the_right else dest_space.x + 1
     rook_dest_space = self.board.spaces[rooks_dest_x][castle_y]
 

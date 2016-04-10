@@ -11,6 +11,22 @@ def create(name, color):
     PIECES.ROOK: Rook(color)
   }[name]
 
+# TODO: A better design is to have a Movement object that can tell you what
+# spaces the piece can move to instead of having to brute-force / ask each
+# piece where it can move.
+"""
+class Movement(object):
+  def __init__(self):
+    self.magnitude = -1 # By default, the movement has no magnitude restriction
+    self.direction = None # By default, the movement has no direction restriction
+
+  def can_make_move(self, from_space, to_space):
+    raise Exception("Calling base Movement.can_go_to!")
+
+class Horizontal(Movement):
+  def can_make_move(self, from_space, to_space);
+"""
+
 piece_directory = './resources/pieces/'
 class Piece(object):
   def __init__(self, color):
@@ -96,7 +112,6 @@ class Pawn(Piece):
     # TODO: capturing.
 
     return False
-
 
 class King(Piece):
   def __init__(self, color):
